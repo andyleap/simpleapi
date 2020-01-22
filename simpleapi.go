@@ -1,4 +1,4 @@
-package main
+package simpleapi
 
 import (
 	"encoding/json"
@@ -196,5 +196,5 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		return
 	}
-
+	m.call(params, w, r)
 }
