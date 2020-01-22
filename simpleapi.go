@@ -117,14 +117,31 @@ type Route struct {
 	handler *handler
 }
 
+func (r *Route) clone() *Route {
+	return &Route{
+		api:     r.api,
+		route:   r.route,
+		methods: r.methods,
+		handler: r.handler,
+	}
+}
+
 func (r *Route) To(f interface{}) {
 	v := reflect.ValueOf(f)
 	r.handler.v = v
 	r.api.addRoute(r)
 }
 
-func (r *Route) Body(arg int) {
-	r.handler.jsonBody = arg
+func (r *Route) Body(arg int) *Route {
+	newr := r.clone()
+	newr.handler.jsonBody = arg
+	return newr
+}
+
+func (r *Route) Method(m ...string) *Route {
+	newr := r.clone()
+	newr.methods = m
+	return newr
 }
 
 func (a *API) addRoute(r *Route) {
