@@ -56,7 +56,7 @@ type param struct {
 func (h *handler) call(params []string, w http.ResponseWriter, r *http.Request) {
 	t := h.v.Type()
 	args := make([]reflect.Value, t.NumIn())
-	if h.jsonBody > 0 {
+	if h.jsonBody >= 0 {
 		args[h.jsonBody] = reflect.New(t.In(h.jsonBody)).Elem()
 		dec := json.NewDecoder(r.Body)
 		dec.Decode(args[h.jsonBody].Interface())
@@ -103,9 +103,11 @@ func (h *handler) call(params []string, w http.ResponseWriter, r *http.Request) 
 
 func (a *API) Route(route string) *Route {
 	return &Route{
-		api:     a,
-		route:   route,
-		handler: &handler{},
+		api:   a,
+		route: route,
+		handler: &handler{
+			jsonBody: -1,
+		},
 	}
 }
 
@@ -156,7 +158,7 @@ func (a *API) addRoute(r *Route) {
 		if strings.HasPrefix(v, "{") && strings.HasSuffix(v, "}") {
 			arg, err := strconv.Atoi(strings.TrimPrefix(strings.TrimSuffix(v, "}"), "{"))
 			if err == nil {
-				if arg > 0 {
+				if arg >= 0 {
 					params = append(params, param{
 						path: paramnum,
 						arg:  arg,
